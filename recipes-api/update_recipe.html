@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update Recipe</title>
+    <style>
+        /* Same styles as before */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Update a Recipe</h1>
+        
+        <!-- Search Form -->
+        <form id="searchRecipeForm">
+            <label for="searchType">Search by:</label>
+            <select id="searchType" name="searchType">
+                <option value="id">ID</option>
+                <option value="title">Title</option>
+            </select>
+            <label for="searchValue">Enter Recipe ID or Title:</label>
+            <input type="text" id="searchValue" name="searchValue" required>
+            <input type="submit" value="Search Recipe">
+        </form>
+
+        <!-- Recipe Form Container -->
+        <div id="recipeFormContainer" style="display:none;">
+            <form id="updateRecipeForm">
+                <input type="hidden" id="id" name="id">
+                <label for="title">Title:</label>
+                <input type="text" id="title" name="title" required><br>
+                <label for="ingredients">Ingredients:</label>
+                <textarea id="ingredients" name="ingredients" required></textarea><br>
+                <label for="instructions">Instructions:</label>
+                <textarea id="instructions" name="instructions" required></textarea><br>
+                <input type="submit" value="Update Recipe">
+            </form>
+        </div>
+
+        <!-- Message Container -->
+        <div id="message"></div>
+    </div>
+
+    <script>
+        document.getElementById('searchRecipeForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const searchType = document.getElementById('searchType').value;
+            const searchValue = document.getElementById('searchValue').value;
+            const queryParam = searchType === 'id' ? 'id' : 'title';
+
+            fetch(`api/recipes/read.php?${queryParam}=${encodeURIComponent(searchValue)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        document.getElementById('message').innerHTML = data.message;
+                        document.getElementById('recipeFormContainer').style.display = 'none';
+                    } else {
+                        document.getElementById('recipeFormContainer').style.display = 'block';
+                        document.getElementById('id').value = data.id;
+                        document.getElementById('title').value = data.title;
+                        document.getElementById('ingredients').value = data.ingredients;
+                        document.getElementById('instructions').value = data.instructions;
+                        document.getElementById('message').innerHTML = '';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('message').innerHTML = 'An error occurred: ' + error.message;
+                });
+        });
+
+        document.getElementById('updateRecipeForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = {
+                id: document.getElementById('id').value,
+                title: document.getElementById('title').value,
+                ingredients: document.getElementById('ingredients').value,
+                instructions: document.getElementById('instructions').value
+            };
+
+            fetch('api/recipes/update.php', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    document.getElementById('message').innerHTML = data.message;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('message').innerHTML = 'An error occurred: ' + error.message;
+                });
+        });
+    </script>
+</body>
+</html>

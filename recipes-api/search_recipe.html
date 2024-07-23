@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Recipes</title>
+</head>
+<body>
+    <h1>Search Recipes</h1>
+    <form id="searchRecipeForm">
+        <label for="searchQuery">Search by Title or Ingredients:</label>
+        <input type="text" id="searchQuery" name="searchQuery" required>
+        <input type="submit" value="Search">
+    </form>
+
+    <div id="results"></div>
+
+    <script>
+        document.getElementById('searchRecipeForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const searchQuery = document.getElementById('searchQuery').value;
+
+            fetch(`api/recipes/search.php?query=${encodeURIComponent(searchQuery)}`)
+                .then(response => response.json())
+                .then(data => {
+                    const resultsDiv = document.getElementById('results');
+                    resultsDiv.innerHTML = '';
+
+                    if (data.length === 0) {
+                        resultsDiv.innerHTML = 'No recipes found.';
+                    } else {
+                        const ul = document.createElement('ul');
+                        data.forEach(recipe => {
+                            const li = document.createElement('li');
+                            li.textContent = `Title: ${recipe.title}, Ingredients: ${recipe.ingredients}`;
+                            ul.appendChild(li);
+                        });
+                        resultsDiv.appendChild(ul);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('results').innerHTML = 'An error occurred.';
+                });
+        });
+    </script>
+</body>
+</html>
