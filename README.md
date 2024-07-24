@@ -44,3 +44,7 @@ we can switch databases by changing the DSN (Data Source Name) without modifying
 *Prepared Statements*:
 Protects against SQL injection attacks.
 Separates SQL code from data, allowing for safe data handling.
+
+
+LIMITATION OF THIS PROJECT:
+I DON'T ADD A HOME BUTTON TO GO BACK ,SO WE GO BACK BROWSER BACK BUTTON AND LOOK THEIR WHICH OPERATION I WANT TO DO.
